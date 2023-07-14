@@ -21,6 +21,8 @@ import CommentComp from '../Comment/CommentComp';
 
 //import Chip from '@mui/material/Chip';
 import { makeStyles } from '@mui/styles';
+import CommentCompForm from '../Comment/CommentCompForm';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,15 +37,21 @@ const useStyles = makeStyles((theme) => ({
 
 
 function Post(props){
-    const {title,text,userName,userId,postId,comment}=props;
+    const {title,text,userName,userId,postId,comment,likes}=props;
     const [expanded, setExpanded] = useState(false);
     const classes=useStyles();
-    const [liked,setLiked]=useState(false);
+
     const [error,setError]=useState(null);
     const [isLoaded,setIsLoaded]=useState(false);
     const [commentList,setCommentList]=useState([]);
     const isInitialMount=useRef(true);
-
+    //const likeCount = likes ? likes.length : 0;
+    const [likeCountc, setLikeCountc]=useState(likes.length);
+    const [isLiked,setIsLiked] = useState(false);
+    const [likeId, setLikeId] =useState(null);
+    const [likeList, setLikeList] = useState(likes);
+  //  const [likeCountc, setLikeCountc] = useState(likeList.length);
+  
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -52,8 +60,16 @@ function Post(props){
         console.log(commentList);
       };
 
-      const handleLike=()=>{
-        setLiked(!liked);
+      const handleLike = () => {
+        setIsLiked(!isLiked);
+        if(!isLiked){
+          saveLike();
+          setLikeCountc(likeCountc + 1);
+        }
+        else{
+        deleteLike();  
+        setLikeCountc(likeCountc - 1);
+        }
       }
 
       const refreshComments=()=>{
@@ -72,6 +88,49 @@ function Post(props){
 
     }
 
+    const saveLike = () => {
+      fetch("/likes",{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        
+        },
+        body: JSON.stringify({
+          postId: postId,
+          userId : userId,
+
+        }),
+
+      })
+        .then((res) => res.json())
+        
+        .catch((err) => console.log(err))
+
+    }
+
+    const deleteLike = () => {
+      fetch("/likes/"+likeId,{
+        method: "DELETE",
+      }) 
+       // .then((res) => res.json())
+    
+        .catch((err) => console.log(err))
+    }
+
+    const checkLikes = () => {
+    
+      
+      if (likes && Array.isArray(likes) && likes.length > 0) {
+        const likeControl = likes.find(like => like.userId === userId);
+        if (likeControl != null) {
+          setLikeId(likeControl.id)
+        
+          setIsLiked(true);
+        }
+      }
+     
+      }
+
 
     useEffect(()=>{
       if (isInitialMount.current) 
@@ -79,6 +138,9 @@ function Post(props){
         else
       refreshComments();
     },[commentList])
+
+    useEffect(() => {
+      checkLikes();},[])
 
     return(
       
@@ -107,9 +169,10 @@ function Post(props){
   <IconButton 
   onClick={handleLike}
   aria-label="add to favorites">
-    <FavoriteIcon style={liked? {color:"red"} : null} />
+    <FavoriteIcon style={isLiked ? {color:"red"} : null} />
 
   </IconButton>
+ {likeCountc}
   <div style={{ marginLeft: "auto" }}>
     <IconButton
       expand={expanded}
@@ -128,6 +191,8 @@ function Post(props){
              : isLoaded ? 
               commentList.map(comment => (<CommentComp userId = {1}  userName = {"USER"} text = {comment.text}></CommentComp>)) : 
               "loading"}
+
+              <CommentCompForm userId = {1}  userName = {"USER"} postId = {postId}></CommentCompForm>
             </Container>
         </Collapse>
       </Card>

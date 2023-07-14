@@ -2,6 +2,7 @@ package com.projectapp.questapp.controllers;
 
 import com.projectapp.questapp.entities.Like;
 import com.projectapp.questapp.requests.LikeCreateRequest;
+import com.projectapp.questapp.responses.LikeResponse;
 import com.projectapp.questapp.services.LikeService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,13 +18,13 @@ public class LikeController {
 
 
     @GetMapping
-    public List<Like> getAllLikes(@RequestParam Optional<Long> userId,@RequestParam Optional<Long> postId){
+    public List<LikeResponse> getAllLikes(@RequestParam Optional<Long> userId, @RequestParam Optional<Long> postId){
 
         return likeService.getAllLikesWithParam(userId,postId);
     }
 
     @PostMapping
-    public Like createOneLike(LikeCreateRequest request){
+    public Like createOneLike(@RequestBody LikeCreateRequest request){
 
         return likeService.createOneLike(request);
     }

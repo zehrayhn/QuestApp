@@ -1,5 +1,5 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, Navigate, useNavigate} from "react-router-dom";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 
 import { makeStyles } from '@mui/styles';
+import { LockOpen } from "@mui/icons-material";
 
 // eslint-disable-next-line no-unused-vars
 
@@ -29,6 +30,15 @@ const useStyles=makeStyles((theme)=> ({
 
    function Navbar(){
     let userId=5;
+    const navigate = useNavigate(); 
+  
+
+    const onClick = () => {
+      localStorage.removeItem("tokenKey")
+      localStorage.removeItem("currentUser")
+      localStorage.removeItem("userName")
+      navigate("/");
+    }
   
     
     return(
@@ -46,10 +56,14 @@ const useStyles=makeStyles((theme)=> ({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6"component="div" sx={{ flexGrow: 1, textAlign: 'left'  }} >
-          <Link  style={{ textDecoration: "none", boxShadow: "none", color: "white" }} to="/">Home</Link>
+          <Link  style={{ textDecoration: "none", boxShadow: "none", color: "white" }}  to="/">Home</Link>
           </Typography>
           <Typography variant="h6">
-          <Link to={{ pathname: '/users/' + userId }} style={{ textDecoration: "none", boxShadow: "none", color: "white" }} >User</Link>
+            {localStorage.getItem("currentUser") == null ? (<Link to="/auth">login/Register</Link>) : (
+           <div><IconButton onClick={onClick}><LockOpen></LockOpen></IconButton>
+          <Link to={{ pathname: '/users/' + localStorage.getItem("currentUser") }} style={{ textDecoration: "none", boxShadow: "none", color: "white" }} >Profile</Link>
+          </div>)} 
+
           </Typography>
         </Toolbar>
       </AppBar>

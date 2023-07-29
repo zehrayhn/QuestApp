@@ -19,7 +19,7 @@ function HomeP(){
     const [postList,setPostList]=useState([]);
     
     const refreshPosts=()=>{
-        fetch("/posts/userId")
+        fetch("/posts")
         .then(res => res.json())
         .then(
             (result) =>{
@@ -47,7 +47,7 @@ function HomeP(){
     }else{
         return(
             <div style={containerStyle}>
-                <PostForm userId={1} userName={"ddd"} refreshPosts={refreshPosts} />
+               {localStorage.getItem("currentUser") == null ? "" : <PostForm userId={localStorage.getItem("currentUser")} userName={localStorage.getItem("userName")} refreshPosts={refreshPosts} />}
         {postList.map((post) => (
           <Post likes={post.postLikes} postId={post.id} userId={post.userId || ''} userName={post.userName || ''} 
           title={post.title} text={post.text} />

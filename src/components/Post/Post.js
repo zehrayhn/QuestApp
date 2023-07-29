@@ -13,7 +13,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import { Avatar, Box, Button, Collapse, Container } from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { ExpandMore } from "@mui/icons-material";
+import { ExpandMore, LocalCafe } from "@mui/icons-material";
 
 import CommentIcon from '@mui/icons-material/Comment';
 import { Link } from "react-router-dom";
@@ -50,7 +50,7 @@ function Post(props){
     const [isLiked,setIsLiked] = useState(false);
     const [likeId, setLikeId] =useState(null);
     const [likeList, setLikeList] = useState(likes);
-  //  const [likeCountc, setLikeCountc] = useState(likeList.length);
+   let disabled =localStorage.getItem("currentUser") == null ? true: false;
   
 
     const handleExpandClick = () => {
@@ -61,6 +61,7 @@ function Post(props){
       };
 
       const handleLike = () => {
+        if(!disabled){
         setIsLiked(!isLiked);
         if(!isLiked){
           saveLike();
@@ -70,6 +71,7 @@ function Post(props){
         deleteLike();  
         setLikeCountc(likeCountc - 1);
         }
+      }
       }
 
       const refreshComments=()=>{
@@ -93,11 +95,11 @@ function Post(props){
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        
+          "Authorization" : localStorage.getItem("tokenKey"),
         },
         body: JSON.stringify({
           postId: postId,
-          userId : userId,
+          userId : localStorage.getItem("currentUser"),
 
         }),
 
@@ -111,6 +113,10 @@ function Post(props){
     const deleteLike = () => {
       fetch("/likes/"+likeId,{
         method: "DELETE",
+        headers: {
+     
+          "Authorization" : localStorage.getItem("tokenKey"),
+        },
       }) 
        // .then((res) => res.json())
     
@@ -121,7 +127,7 @@ function Post(props){
     
       
       if (likes && Array.isArray(likes) && likes.length > 0) {
-        const likeControl = likes.find(like => like.userId === userId);
+        const likeControl = likes.find((like => ""+like.userId === localStorage.getItem("currentUser")));
         if (likeControl != null) {
           setLikeId(likeControl.id)
         
@@ -166,7 +172,9 @@ function Post(props){
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
+  
   <IconButton 
+ 
   onClick={handleLike}
   aria-label="add to favorites">
     <FavoriteIcon style={isLiked ? {color:"red"} : null} />
@@ -192,7 +200,7 @@ function Post(props){
               commentList.map(comment => (<CommentComp userId = {1}  userName = {"USER"} text = {comment.text}></CommentComp>)) : 
               "loading"}
 
-              <CommentCompForm userId = {1}  userName = {"USER"} postId = {postId}></CommentCompForm>
+             {disabled? "" : <CommentCompForm userId = {1}  userName = {"USER"} postId = {postId}></CommentCompForm>}
             </Container>
         </Collapse>
       </Card>

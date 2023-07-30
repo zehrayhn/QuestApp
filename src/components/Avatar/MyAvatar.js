@@ -15,7 +15,9 @@ import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
-
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,17 +42,24 @@ function MyAvatar(){
   const classes = useStyles();
   const [open,setOpen] = useState(false);
   const classes2 = useStyles();
-  
+  const [selectedAvatar, setSelectedAvatar] = useState("");
 
   const handleOpen = () => {
     setOpen(true);
   };
   const handleClose = () => {
-    setOpen(false);
-
-    
+    setOpen(false);  
 
  };
+
+ const handleAvatarChange = (event) => {
+  setSelectedAvatar(event.target.value); // Radio button değiştiğinde seçilen avatar yolunu güncelleyin
+};
+
+const handleAvatarSave = () => {
+  // İstenirse seçilen avatar yolunu burada kullanabilirsiniz
+  setOpen(false);
+};  
     return(
         <div>
            <Card className={classes.root} >
@@ -75,83 +84,43 @@ function MyAvatar(){
        
       </CardActions>
     </Card>
-
-<Modal
+    <Modal
   open={open}
   onClose={handleClose}
   aria-labelledby="modal-modal-title"
   aria-describedby="modal-modal-description"
 >
-  <Box sx={classes2.customBox}>
-  <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Brunch this weekend?"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                Ali Connors
-              </Typography>
-              {" — I'll be in your neighborhood doing errands this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Summer BBQ"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                to Scott, Alex, Jennifer
-              </Typography>
-              {" — Wish I could come, but I'm out of town this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Oui Oui"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                Sandra Adams
-              </Typography>
-              {' — Do you have Paris recommendations? Have you ever…'}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-    </List>
+  <Box  sx={classes2.customBox} >
+    <RadioGroup
+      aria-label="avatar"
+      name="avatar"
+      value={selectedAvatar} // Seçilen avatarı takip etmek için bir state ekleyin
+      onChange={handleAvatarChange} // Seçilen avatarı güncellemek için bir işleyici ekleyin
+    >
+      {Array.from({ length: 6 }, (_, index) => index + 1).map((key) => {
+        const labelId = `checkbox-list-secondary-label-${key}`;
+        const avatarPath = `/avatars/avatar${key}.png`; // Avatar resimleri avatar1.png, avatar2.png gibi varsayılan olarak isimlendirilmiş olsun.
+        return (
+          <ListItem key={key} alignItems="flex-start">
+            <ListItemAvatar>
+              <Avatar alt={`Avatar ${key}`} src={avatarPath} />
+            </ListItemAvatar>
+            <ListItemText
+              primary={key}
+            />
+            <FormControlLabel
+              value={avatarPath} // Radio button'un değerini seçilen avatar resminin yolunu olarak ayarlayın
+              control={<Radio />}
+              label="Seç"
+            />
+          </ListItem>
+        );
+      })}
+    </RadioGroup>
+    <Button onClick={handleAvatarSave}>Kaydet</Button> {/* Seçilen avatarı kaydetmek için bir düğme ekleyin */}
   </Box>
 </Modal>
+
         </div>
     )
 }
